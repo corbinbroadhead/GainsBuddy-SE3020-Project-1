@@ -5,13 +5,12 @@ import DropDownPicker from "react-native-dropdown-picker";
 type FormDropdownProps = {
 	label: string;
 	options: { label: string; value: string }[];
-	selected?: string;
-	onValueChange?: (val: string) => void;
+	selected: string;
+	onValueChange: (val: string) => void;
 };
 
 const FormDropdown = ({ label, options, selected, onValueChange }: FormDropdownProps) => {
 	const [open, setOpen] = useState(false);
-	const [value, setValue] = useState(selected || options[0].value);
 	const [items, setItems] = useState(options);
 
 	return (
@@ -19,14 +18,17 @@ const FormDropdown = ({ label, options, selected, onValueChange }: FormDropdownP
 			<Text style={styles.label}>{label}</Text>
 			<DropDownPicker
 				open={open}
-				value={value}
+				value={selected} // controlled by parent
 				items={items}
 				setOpen={setOpen}
-				setValue={setValue}
+				setValue={(callback) => {
+					// DropDownPicker gives back a function; call it to get the next value
+					const nextValue = callback(selected);
+					if (typeof nextValue === "string") {
+						onValueChange(nextValue);
+					}
+				}}
 				setItems={setItems}
-				onChangeValue={(val: string | null) => {
-                    if (val !== null) onValueChange?.(val);
-                }}
 				placeholder="Select..."
 				style={styles.picker}
 				dropDownContainerStyle={styles.dropdown}
@@ -41,22 +43,22 @@ const styles = StyleSheet.create({
 	container: {
 		width: "90%",
 		marginTop: 10,
-        marginBottom: 10,
-        backgroundColor: "#425363ff"
+		marginBottom: 10,
+		backgroundColor: "#425363ff"
 	},
-    label: {
-        color: "#dde2e5ff",
-        fontWeight: "bold",
-        fontSize: 14,
-        letterSpacing: 1.5,
-        paddingLeft: 5
-    },
+	label: {
+		color: "#dde2e5ff",
+		fontWeight: "bold",
+		fontSize: 14,
+		letterSpacing: 1.5,
+		paddingLeft: 5
+	},
 	picker: {
 		backgroundColor: "#dde2e5ff",
 		borderColor: "#425363ff",
 		borderWidth: 4,
 		borderRadius: 10,
-		height: 40, // compact height
+		height: 40,
 		paddingHorizontal: 10,
 	},
 	dropdown: {

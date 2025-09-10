@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Keyboard, StyleSheet, Text, TextInput, View } from "react-native";
 
 
@@ -7,10 +7,11 @@ type FormTextInputProps = {
   placeholder: string;
   size?: number;
   textSize?: number;
+  value: string;
+  onChange: (text: string) => void;
 };
 
-const FormTextInput = ({ label, placeholder, size, textSize }: FormTextInputProps) => {
-    const [value, setValue] = useState("");
+const FormTextInput = ({ label, placeholder, size, textSize, onChange, value }: FormTextInputProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
@@ -19,7 +20,7 @@ const FormTextInput = ({ label, placeholder, size, textSize }: FormTextInputProp
 				style={[styles.text, {height: size || 35}, {fontSize: textSize || 18}]}
 				placeholder={placeholder}
 				value={value}
-				onChangeText={setValue}
+				onChangeText={onChange}
                 multiline={true}
                 textAlignVertical="top"
 	            onKeyPress={({ nativeEvent }) => {
