@@ -1,29 +1,25 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Stack } from "expo-router";
+{/*Header color = #18191dff*/}
+{/*Background color = #2e3c49ff*/}
+{/*Yellow = #efda22ff*/}
+{/*Salt = #dde2e5ff*/}
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+{/*async storage */}
+{/*date picker */}
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+  return <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#18191dff',
+        },
+        headerTintColor: '#dde2e5ff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}>
+      <Stack.Screen name="index" options={{ title: "Gains Buddy" , headerBackVisible: false}} />
+      <Stack.Screen name="log" options={{ title: "Gains Buddy" , headerBackVisible: false}} />
+      <Stack.Screen name="create" options={{ title: "Gains Buddy" , headerBackVisible: false}} />
+    </Stack>;
 }
