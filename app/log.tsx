@@ -2,6 +2,7 @@ import FormDropdown from '@/components/FormDropdown';
 import FormTextInput from '@/components/FormTextInput';
 import SetBox from '@/components/SetBox';
 import TitleBar from '@/components/TitleBar';
+import { saveLoggedWorkout } from '@/utils/storage';
 import { useRouter } from 'expo-router';
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
@@ -36,10 +37,13 @@ export default function Log() {
     });
   }, [setCount]);
 
-  const handleSave = () => {
-    console.log("Workout:", workout);
-    console.log("Sets:", sets);
-    // TO DO: save to DB, send to API, etc.
+  const handleSave = async () => {
+    const entry = {
+      workout,
+      sets,
+      date: new Date().toISOString(),
+    };
+    await saveLoggedWorkout(entry);
     router.back();
   };
 
@@ -91,6 +95,7 @@ export default function Log() {
           placeholder="Enter the number of sets..."
           value={setCount}
           onChange={setSetCount}
+          numberPad={true}
         />
 
         <ScrollView contentContainerStyle={styles.grid}>

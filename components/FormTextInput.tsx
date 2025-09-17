@@ -8,10 +8,11 @@ type FormTextInputProps = {
   size?: number;
   textSize?: number;
   value: string;
+  numberPad?: boolean;
   onChange: (text: string) => void;
 };
 
-const FormTextInput = ({ label, placeholder, size, textSize, onChange, value }: FormTextInputProps) => {
+const FormTextInput = ({ label, placeholder, size, textSize, onChange, value, numberPad=false }: FormTextInputProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
@@ -20,6 +21,7 @@ const FormTextInput = ({ label, placeholder, size, textSize, onChange, value }: 
 				style={[styles.text, {height: size || 35}, {fontSize: textSize || 18}]}
 				placeholder={placeholder}
 				value={value}
+        keyboardType={numberPad ? "numeric" : "default"}
 				onChangeText={onChange}
                 multiline={true}
                 textAlignVertical="top"

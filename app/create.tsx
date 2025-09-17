@@ -1,6 +1,7 @@
 import FormDropdown from '@/components/FormDropdown';
 import FormTextInput from '@/components/FormTextInput';
 import TitleBar from '@/components/TitleBar';
+import { saveCreatedWorkout } from '@/utils/storage';
 import { useRouter } from 'expo-router';
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
@@ -14,12 +15,9 @@ export default function Create() {
   const [category, setCategory] = useState("");
   const [notes, setNotes] = useState("");
 
-  const handleSave = () => {
-    console.log("Name:", name);
-    console.log("Category:", category);
-    console.log("Notes:", notes);
-
-    // TO DO: save to DB, send to API, etc.
+  const handleSave = async () => {
+    const workout = { name, category, notes };
+    await saveCreatedWorkout(workout);
     router.back();
   };
 
