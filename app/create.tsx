@@ -39,13 +39,13 @@ export default function Create() {
       >
         <FormTextInput
           label="Name"
-          placeholder="Enter name..."
+          placeholder="Enter workout name..."
           value={name}
           onChange={setName}
         />
 
         <FormDropdown
-          label="Workout Category"
+          label="Category"
           options={[
             { label: "Arms", value: "arms" },
             { label: "Chest", value: "chest" },
@@ -59,7 +59,7 @@ export default function Create() {
 
         <FormTextInput
           label="Notes"
-          placeholder="Enter notes..."
+          placeholder="Machine location, number..."
           size={175}
           textSize={14}
           value={notes}
