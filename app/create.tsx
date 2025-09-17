@@ -13,10 +13,9 @@ export default function Create() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
-  const [notes, setNotes] = useState("");
 
   const handleSave = async () => {
-    const workout = { name, category, notes };
+    const workout = { name, category };
     await saveCreatedWorkout(workout);
     router.back();
   };
@@ -55,27 +54,26 @@ export default function Create() {
           onValueChange={setCategory}
         />
 
-        <FormTextInput
-          label="Notes"
-          placeholder="Machine location, number..."
-          size={175}
-          textSize={14}
-          value={notes}
-          onChange={setNotes}
-        />
-
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
+            flex: 1,
+            justifyContent: "flex-end",
             width: "100%",
             paddingHorizontal: 20,
             marginTop: 20
           }}
         >
-          <SaltButton text="Cancel" onPress={() => router.back()} />
-          <YellowButton text="Save" onPress={handleSave} />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <SaltButton text="Cancel" onPress={() => router.back()} />
+            <YellowButton text="Save" onPress={handleSave} />
+          </View>
         </View>
       </View>
     </>

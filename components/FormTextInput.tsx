@@ -1,5 +1,5 @@
 import React from "react";
-import { Keyboard, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 
 type FormTextInputProps = {
@@ -23,12 +23,6 @@ const FormTextInput = ({ label, placeholder, size, textSize, onChange, value, nu
 				value={value}
         keyboardType={numberPad ? "numeric" : "default"}
 				onChangeText={onChange}
-                multiline={true}
-                textAlignVertical="top"
-	            onKeyPress={({ nativeEvent }) => {
-                    if (nativeEvent.key === "Enter") {
-                        Keyboard.dismiss();
-                }}}
 			/>
       </View>
     </View>
