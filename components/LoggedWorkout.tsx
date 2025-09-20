@@ -6,9 +6,10 @@ type LoggedWorkoutProps = {
   workoutName: string;
   totalReps: number;
   avgWeight: number;
+  maxWeight: number;
 };
 
-const LoggedWorkout = ({ date, workoutName, totalReps, avgWeight }: LoggedWorkoutProps) => {
+const LoggedWorkout = ({ date, workoutName, totalReps, avgWeight, maxWeight }: LoggedWorkoutProps) => {
   return (
     <View style={styles.container}>
       {/* Date Bar */}
@@ -32,6 +33,10 @@ const LoggedWorkout = ({ date, workoutName, totalReps, avgWeight }: LoggedWorkou
           <View style={styles.statBlock}>
             <Text style={styles.label}>Avg. Weight</Text>
             <Text style={[styles.value]}>{avgWeight}</Text>
+          </View>
+          <View style={styles.statBlock}>
+            <Text style={styles.label}>Max Weight</Text>
+            <Text style={[styles.value]}>{maxWeight}</Text>
           </View>
         </View>
       </View>

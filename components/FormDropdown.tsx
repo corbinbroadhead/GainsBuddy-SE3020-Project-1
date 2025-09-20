@@ -1,42 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 
 type FormDropdownProps = {
-	label: string;
-	options: { label: string; value: string }[];
-	selected: string;
-	onValueChange: (val: string) => void;
+  label: string;
+  options: { label: string; value: string }[];
+  selected: string;
+  onValueChange: (val: string) => void;
 };
 
 const FormDropdown = ({ label, options, selected, onValueChange }: FormDropdownProps) => {
-	const [open, setOpen] = useState(false);
-	const [items, setItems] = useState(options);
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState(options);
 
-	return (
-		<View style={styles.container}>
-			<Text style={styles.label}>{label}</Text>
-			<DropDownPicker
-				open={open}
-				value={selected} // controlled by parent
-				items={items}
-				setOpen={setOpen}
-				setValue={(callback) => {
-					// DropDownPicker gives back a function; call it to get the next value
-					const nextValue = callback(selected);
-					if (typeof nextValue === "string") {
-						onValueChange(nextValue);
-					}
-				}}
-				setItems={setItems}
-				placeholder="Select..."
-				style={styles.picker}
-				dropDownContainerStyle={styles.dropdown}
-				textStyle={styles.text}
-				dropDownDirection="BOTTOM"
-			/>
-		</View>
-	);
+  useEffect(() => {
+    setItems(options);
+  }, [options]);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>{label}</Text>
+      <DropDownPicker
+        open={open}
+        value={selected}
+        items={items}
+        setOpen={setOpen}
+        setValue={(callback) => {
+          const nextValue = callback(selected);
+          if (typeof nextValue === "string") {
+            onValueChange(nextValue);
+          }
+        }}
+        setItems={setItems}
+        placeholder="Select..."
+        style={styles.picker}
+        dropDownContainerStyle={styles.dropdown}
+        textStyle={styles.text}
+        dropDownDirection="BOTTOM"
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({

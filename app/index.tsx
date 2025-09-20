@@ -1,8 +1,8 @@
 import LoggedWorkout from '@/components/LoggedWorkout';
 import TitleBar from '@/components/TitleBar';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { ScrollView, View } from "react-native";
 import SaltButton from "../components/SaltButton";
 import YellowButton from "../components/YellowButton";
@@ -12,29 +12,50 @@ export default function Index() {
   const router = useRouter();
   const [logs, setLogs] = useState<any[]>([]);
 
-  useEffect(() => {
-    const loadLogs = async () => {
-      const savedLogs = await getData("loggedWorkouts");
-      if (savedLogs) {
-        setLogs(savedLogs);
-      }
-    };
-    loadLogs();
-  }, []);
+  const loadLogs = async () => {
+    const savedLogs = await getData("loggedWorkouts");
+    if (savedLogs) {
+      setLogs(savedLogs);
+    } else {
+      setLogs([]);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadLogs();
+    }, [])
+  );
+
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }) + " " + date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
 
   const getTotals = (sets: { weight: string; reps: string }[]) => {
     let totalReps = 0;
     let totalWeight = 0;
+    let maxWeight = 0;
 
     sets.forEach(s => {
       const reps = parseInt(s.reps) || 0;
       const weight = parseInt(s.weight) || 0;
       totalReps += reps;
       totalWeight += weight * reps;
+      if (weight > maxWeight) {
+        maxWeight = weight;
+      }
     });
 
     const avgWeight = totalReps > 0 ? Math.round(totalWeight / totalReps) : 0;
-    return { totalReps, avgWeight };
+    return { totalReps, avgWeight, maxWeight };
   };
 
   return (
@@ -54,18 +75,30 @@ export default function Index() {
         }}
       >
         <ScrollView style={{ width: "100%" }} contentContainerStyle={{ alignItems: "center" }}>
-          {logs.slice(-5).reverse().map((log, index) => {
-            const { totalReps, avgWeight } = getTotals(log.sets);
-            return (
-              <LoggedWorkout
-                key={index}
-                date={log.date}
-                workoutName={log.workout}
-                totalReps={totalReps}
-                avgWeight={avgWeight}
-              />
-            );
-          })}
+          {logs
+            .filter(log => {
+              const logDate = new Date(log.date);
+              const now = new Date();
+
+              const diffMs = now.getTime() - logDate.getTime();
+              const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+              return diffDays <= 2;
+            })
+            .reverse()
+            .map((log, index) => {
+              const { totalReps, avgWeight, maxWeight } = getTotals(log.sets);
+              return (
+                <LoggedWorkout
+                  key={index}
+                  date={formatDate(log.date)}
+                  workoutName={log.workout}
+                  totalReps={totalReps}
+                  avgWeight={avgWeight}
+                  maxWeight={maxWeight}
+                />
+              );
+            })}
         </ScrollView>
 
         <View

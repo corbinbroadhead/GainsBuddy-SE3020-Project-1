@@ -17,6 +17,7 @@ export default function Create() {
   const handleSave = async () => {
     const workout = { name, category };
     await saveCreatedWorkout(workout);
+    alert("Workout created!")
     router.back();
   };
 

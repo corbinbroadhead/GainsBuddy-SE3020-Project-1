@@ -2,10 +2,10 @@ import FormDropdown from '@/components/FormDropdown';
 import FormTextInput from '@/components/FormTextInput';
 import SetBox from '@/components/SetBox';
 import TitleBar from '@/components/TitleBar';
-import { saveLoggedWorkout } from '@/utils/storage';
-import { useRouter } from 'expo-router';
+import { getCreatedWorkouts, saveLoggedWorkout } from '@/utils/storage';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import SaltButton from "../components/SaltButton";
 import YellowButton from "../components/YellowButton";
@@ -15,22 +15,62 @@ export default function Log() {
 
   const [setCount, setSetCount] = useState("");
   const [workout, setWorkout] = useState("");
-
-  // Array of { weight, reps } for each set
   const [sets, setSets] = useState<{ weight: string; reps: string }[]>([]);
+  const [workoutOptions, setWorkoutOptions] = useState<{ label: string; value: string }[]>([]);
 
-  // Whenever setCount changes, adjust the sets array length
+  const loadWorkouts = useCallback(async () => {
+    try {
+      const saved = await getCreatedWorkouts();
+      console.log("Log.tsx — loaded created workouts:", saved);
+
+      if (Array.isArray(saved) && saved.length > 0) {
+        const opts = saved.map((w: any) => {
+          const label = w?.name ?? w?.label ?? String(w);
+          const value = w?.name ?? w?.value ?? label;
+          return { label, value };
+        });
+        opts.sort((a, b) => a.label.localeCompare(b.label));
+
+        setWorkoutOptions(opts);
+
+        setWorkout(prev => (prev && prev.length > 0 ? prev : opts[0].value));
+      } else {
+        setWorkoutOptions([]);
+        setWorkout("");
+      }
+    } catch (err) {
+      console.error("Log.tsx — error loading created workouts:", err);
+      setWorkoutOptions([]);
+      setWorkout("");
+    }
+  }, []);
+
+  useEffect(() => {
+    loadWorkouts();
+  }, [loadWorkouts]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let mounted = true;
+      (async () => {
+        await loadWorkouts();
+        if (mounted) {
+          console.log("Log.tsx — refocused and refreshed workouts");
+        }
+      })();
+      return () => {
+        mounted = false;
+      };
+    }, [loadWorkouts])
+  );
+
   useEffect(() => {
     const count = parseInt(setCount) || 0;
     setSets(prev => {
       const newSets = [...prev];
       if (count > newSets.length) {
-        // add more sets
-        while (newSets.length < count) {
-          newSets.push({ weight: "", reps: "" });
-        }
+        while (newSets.length < count) newSets.push({ weight: "", reps: "" });
       } else if (count < newSets.length) {
-        // remove extra sets
         newSets.length = count;
       }
       return newSets;
@@ -44,6 +84,7 @@ export default function Log() {
       date: new Date().toISOString(),
     };
     await saveLoggedWorkout(entry);
+    alert("Workout logged!")
     router.back();
   };
 
@@ -65,27 +106,12 @@ export default function Log() {
 
   return (
     <>
-      <StatusBar style="light" /> 
+      <StatusBar style="light" />
       <TitleBar text="LOG A WORKOUT" />
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "flex-start",
-          alignItems: "center",
-          backgroundColor: "#2e3c49ff",
-          paddingBottom: "15%",
-          paddingTop: "10%"
-        }}
-      >
+      <View style={styles.screen}>
         <FormDropdown
           label="Workout"
-          options={[
-            { label: "Bench press", value: "bench press" },
-            { label: "Bicep curls", value: "bicep curls" },
-            { label: "Bulgarian split squat", value: "bulgarian split squat" },
-            { label: "Calf raise", value: "calf raise" },
-            { label: "Deadlift", value: "deadlift" }
-          ]}
+          options={workoutOptions}
           selected={workout}
           onValueChange={setWorkout}
         />
@@ -111,16 +137,7 @@ export default function Log() {
           ))}
         </ScrollView>
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "100%",
-            paddingHorizontal: 20,
-            marginTop: 20
-          }}
-        >
+        <View style={styles.buttonRow}>
           <SaltButton text="Cancel" onPress={() => router.back()} />
           <YellowButton text="Save" onPress={handleSave} />
         </View>
@@ -130,10 +147,30 @@ export default function Log() {
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    backgroundColor: "#2e3c49ff",
+    paddingBottom: "15%",
+    paddingTop: "10%",
+    width: "100%",
+  },
   grid: {
-  flexDirection: "row",
-  flexWrap: "wrap",
-  justifyContent: "center", // keeps items centered when row not full
-  gap: 12, // RN 0.71+ supports gap, otherwise use margin
-  }
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 12,
+    width: "100%",
+    paddingHorizontal: 12,
+    paddingTop: 12,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
 });

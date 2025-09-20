@@ -5,7 +5,7 @@ import { Stack } from "expo-router";
 {/*Salt = #dde2e5ff*/}
 
 {/*async storage */}
-{/*date picker */}
+{/*dropdown picker */}
 
 export default function RootLayout() {
   return <Stack
